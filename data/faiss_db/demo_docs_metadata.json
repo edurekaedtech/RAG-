@@ -1,0 +1,42 @@
+[
+  {
+    "source": "company_policies.txt",
+    "chunk_id": "chunk-0",
+    "text": "COMPANY POLICIES AND PROCEDURES\n\n1. ATTENDANCE AND LEAVE POLICY\n\nAll employees are expected to arrive on time and follow the designated work schedule. \nWe maintain flexible working hours while respecting core business hours (10 AM - 3 PM).\n\nAnnual Leave:\n- Full-time employees receive 20 days of paid annual leave per year\n- Part-time employees receive pro-rata leave based on hours worked\n- Leave requests must be submitted at least 2 weeks in advance\n- During peak business periods, leave may be restricted\n\nSick Leave:\n- Employees are entitled to 10 days of paid sick leave per year\n- A medical certificate is required for absences exceeding 3 consecutive days\n- Unused sick leave cannot be carried forward to the next year\n\nRemote Work:\n- Eligible employees can work remotely up to 3 days per week\n- Manager approval is required for remote work arrangements\n- All company equipment and data must "
+  },
+  {
+    "source": "company_policies.txt",
+    "chunk_id": "chunk-1",
+    "text": "e employees can work remotely up to 3 days per week\n- Manager approval is required for remote work arrangements\n- All company equipment and data must be secured appropriately\n\n2. CODE OF CONDUCT\n\nAll employees must maintain professional conduct and respect workplace values.\n\nConfidentiality:\n- Employees must not disclose confidential company information\n- All employee data must be handled according to data protection regulations\n- Client information is strictly confidential\n\nAnti-Harassment Policy:\n- Zero tolerance for harassment, discrimination, or bullying\n- All incidents must be reported to HR immediately\n- Investigations will be conducted confidentially\n\nConflict of Interest:\n- Employees must disclose any potential conflicts of interest\n- Accepting gifts or bribes from clients is prohibited\n- Side businesses must not compete with company interests\n\n3. HEALTH AND SAFETY\n\nThe company i"
+  },
+  {
+    "source": "company_policies.txt",
+    "chunk_id": "chunk-2",
+    "text": "\n- Accepting gifts or bribes from clients is prohibited\n- Side businesses must not compete with company interests\n\n3. HEALTH AND SAFETY\n\nThe company is committed to maintaining a safe workplace.\n\nWorkplace Safety:\n- All hazards must be reported immediately\n- Safety equipment must be used as instructed\n- Regular safety training is mandatory for all staff\n\nMental Health Support:\n- Employee assistance programs are available\n- Counseling services are provided confidentially\n- Mental health days are supported\n\n4. BENEFITS AND COMPENSATION\n\nSalary and Bonuses:\n- Salaries are reviewed annually\n- Performance bonuses are awarded based on company performance\n- Bonuses are paid in December (subject to company profitability)\n\nHealth Insurance:\n- Company provides comprehensive health insurance coverage\n- Coverage includes dental and vision care\n- Family plans are available at group rates\n\nRetirement "
+  },
+  {
+    "source": "company_policies.txt",
+    "chunk_id": "chunk-3",
+    "text": "y provides comprehensive health insurance coverage\n- Coverage includes dental and vision care\n- Family plans are available at group rates\n\nRetirement Plan:\n- Company contributes 5% of salary to retirement fund\n- Vesting schedule: 20% per year over 5 years\n- Employees can contribute additional amounts"
+  },
+  {
+    "source": "tech_docs.txt",
+    "chunk_id": "chunk-4",
+    "text": "TECHNICAL DOCUMENTATION\n\n1. SYSTEM ARCHITECTURE\n\nOur system is built on a microservices architecture with the following components:\n\nFrontend:\n- Built with React 18 and TypeScript\n- Uses Redux for state management\n- Webpack for bundling and optimization\n\nBackend API:\n- Python FastAPI running on Uvicorn\n- PostgreSQL for primary data storage\n- Redis for caching and sessions\n- Elasticsearch for full-text search\n\nMessage Queue:\n- RabbitMQ for async task processing\n- Workers handle background jobs\n\nDeployment:\n- Docker containers for all services\n- Kubernetes orchestration in production\n- CI/CD pipeline using GitHub Actions\n\n2. API ENDPOINTS\n\nAuthentication:\n- POST /api/v1/auth/login - User login\n- POST /api/v1/auth/logout - User logout\n- POST /api/v1/auth/refresh - Refresh access token\n\nUser Management:\n- GET /api/v1/users - List all users\n- POST /api/v1/users - Create new user\n- GET /api/v1"
+  },
+  {
+    "source": "tech_docs.txt",
+    "chunk_id": "chunk-5",
+    "text": "api/v1/auth/refresh - Refresh access token\n\nUser Management:\n- GET /api/v1/users - List all users\n- POST /api/v1/users - Create new user\n- GET /api/v1/users/{id} - Get user details\n- PUT /api/v1/users/{id} - Update user\n- DELETE /api/v1/users/{id} - Delete user\n\nData Operations:\n- GET /api/v1/data - List data items\n- POST /api/v1/data - Create data item\n- GET /api/v1/data/{id} - Get data item\n- PUT /api/v1/data/{id} - Update data item\n- DELETE /api/v1/data/{id} - Delete data item\n\n3. DATABASE SCHEMA\n\nUsers Table:\n- id (PRIMARY KEY)\n- username (VARCHAR, UNIQUE)\n- email (VARCHAR, UNIQUE)\n- password_hash (VARCHAR)\n- created_at (TIMESTAMP)\n- updated_at (TIMESTAMP)\n\nData Table:\n- id (PRIMARY KEY)\n- user_id (FOREIGN KEY)\n- title (VARCHAR)\n- content (TEXT)\n- status (VARCHAR)\n- created_at (TIMESTAMP)\n- updated_at (TIMESTAMP)\n\n4. DEVELOPMENT SETUP\n\nRequirements:\n- Python 3.10+\n- Node.js 18+\n- Doc"
+  },
+  {
+    "source": "tech_docs.txt",
+    "chunk_id": "chunk-6",
+    "text": "nt (TEXT)\n- status (VARCHAR)\n- created_at (TIMESTAMP)\n- updated_at (TIMESTAMP)\n\n4. DEVELOPMENT SETUP\n\nRequirements:\n- Python 3.10+\n- Node.js 18+\n- Docker and Docker Compose\n- PostgreSQL 14+\n\nSetup Steps:\n1. Clone repository\n2. Copy .env.example to .env\n3. Configure environment variables\n4. Run docker-compose up\n5. Initialize database: python manage.py migrate\n6. Start development servers\n\nRunning Tests:\n- Backend: pytest\n- Frontend: npm test\n- Integration: docker-compose -f docker-compose.test.yml up\n\n5. DEPLOYMENT GUIDE\n\nProduction Deployment:\n1. Build Docker images: docker build -t myapp:latest .\n2. Push to registry: docker push myapp:latest\n3. Deploy to Kubernetes: kubectl apply -f k8s/\n4. Verify services: kubectl get pods\n\nScaling:\n- Horizontal scaling through Kubernetes replicas\n- Database connection pooling with PgBouncer\n- CDN for static assets\n\nMonitoring:\n- Prometheus for metric"
+  },
+  {
+    "source": "tech_docs.txt",
+    "chunk_id": "chunk-7",
+    "text": "rizontal scaling through Kubernetes replicas\n- Database connection pooling with PgBouncer\n- CDN for static assets\n\nMonitoring:\n- Prometheus for metrics collection\n- Grafana for visualization\n- ELK stack for logging\n- Sentry for error tracking"
+  }
+]
