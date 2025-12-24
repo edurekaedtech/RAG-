@@ -11,7 +11,6 @@ from auth import get_api_key
 
 APP_TITLE = "RAG App with Streamlit"
 
-# set_page_config must come BEFORE any st.* UI calls (like st.title)
 st.set_page_config(page_title=APP_TITLE, layout="wide")
 
 st.markdown(
@@ -198,7 +197,7 @@ st.divider()
 left, right = st.columns([1.1, 0.9], vertical_alignment="top")
 
 with left:
-    st.markdown("### 2) Ask questions (RAG + FAISS)")
+    st.markdown("### 2) Ask questions")
 
     # Render chat history
     for msg in st.session_state.messages:
