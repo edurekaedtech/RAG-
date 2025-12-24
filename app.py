@@ -6,11 +6,12 @@ from rag.ingest import ingest
 from rag.retrieve import get_index_and_metadata, retrieve
 from rag.prompts import DOMAIN_SYSTEM_PROMPTS, RAG_USER_TEMPLATE
 
-APP_TITLE = "RAG App with Streamlit "
+# centralized key handling helpers
+from auth import get_api_key
 
+APP_TITLE = "RAG App with Streamlit"
 
-# Page config
-
+# set_page_config must come BEFORE any st.* UI calls (like st.title)
 st.set_page_config(page_title=APP_TITLE, layout="wide")
 
 st.markdown(
@@ -29,11 +30,9 @@ st.caption(
     "Deploy a RAG app with FAISS, prompt specialization, and optimization controls (chunking, top-k, caching, model choice)."
 )
 
-
-
 # Sidebar: Controls
 with st.sidebar:
-    st.header(" RAG Controls")
+    st.header("RAG Controls")
 
     domain_mode = st.selectbox(
         "Assistant specialization",
@@ -50,9 +49,18 @@ with st.sidebar:
     )
 
     st.subheader("Retrieval + Chunking")
-    chunk_size = st.slider("Chunk size", 300, 1500, 900, 50, help="Larger chunks keep context; smaller chunks improve precision.")
-    overlap = st.slider("Chunk overlap", 0, 400, 150, 10, help="Overlap prevents splitting important info across chunks.")
-    top_k = st.slider("Top-k retrieval", 1, 10, 4, 1, help="Higher k may increase recall but add noise + cost.")
+    chunk_size = st.slider(
+        "Chunk size", 300, 1500, 900, 50,
+        help="Larger chunks keep context; smaller chunks improve precision."
+    )
+    overlap = st.slider(
+        "Chunk overlap", 0, 400, 150, 10,
+        help="Overlap prevents splitting important info across chunks."
+    )
+    top_k = st.slider(
+        "Top-k retrieval", 1, 10, 4, 1,
+        help="Higher k may increase recall but add noise + cost."
+    )
 
     st.divider()
 
@@ -63,18 +71,34 @@ with st.sidebar:
 
     st.divider()
 
-    # API Key
-    default_key = ""
+    # Pre-fill from env just to help local use
+    env_key = ""
     try:
-        default_key = get_env("OPENAI_API_KEY", "")
+        env_key = get_env("OPENAI_API_KEY", "")
     except Exception:
-        default_key = ""
+        env_key = ""
 
-    api_key = st.text_input("OPENAI_API_KEY", value=default_key, type="password")
+    # If key already stored in session use it; else try env; else blank
+    default_key = st.session_state.get("OPENAI_API_KEY") or env_key
+
+    api_key_input = st.text_input(
+        "OPENAI_API_KEY",
+        value=default_key,
+        type="password",
+        help="For Streamlit Cloud: prefer Secrets. If not using Secrets, paste key here (stored only for this session).",
+    )
+
+    # If user typed a key, store it in session_state for this run/session
+    if api_key_input:
+        st.session_state["OPENAI_API_KEY"] = api_key_input
+
+    # Now resolve the final key: secrets/env/session (auth.py) OR sidebar input
+    api_key = api_key_input or get_api_key("OPENAI_API_KEY") or get_api_key("API_KEY")
+
     if api_key:
-        st.markdown('<span class="pill"> API key loaded</span>', unsafe_allow_html=True)
+        st.markdown('<span class="pill">API key loaded</span>', unsafe_allow_html=True)
     else:
-        st.markdown('<span class="pill"> API key missing</span>', unsafe_allow_html=True)
+        st.markdown('<span class="pill">API key missing</span>', unsafe_allow_html=True)
 
     st.divider()
     st.markdown(
@@ -83,12 +107,13 @@ with st.sidebar:
         unsafe_allow_html=True,
     )
 
+# Stop if key not provided anywhere
 if not api_key:
-    st.warning("Add OPENAI_API_KEY in the sidebar (or set it in .env).")
+    st.warning("Please add your OpenAI API key in Streamlit Secrets or paste it in the sidebar.")
     st.stop()
 
+# Use the resolved key everywhere below
 client = OpenAI(api_key=api_key)
-
 
 # Cached resources
 @st.cache_resource
@@ -101,16 +126,13 @@ def cached_retrieve(question: str, k: int, persist_dir: str, collection_name: st
     index, metadatas, _ = load_faiss_index(persist_dir, collection_name, api_key)
     return retrieve(index, metadatas, question, api_key, k=k)
 
-
 # Session State
 if "messages" not in st.session_state:
     st.session_state.messages = []  # [{"role":"user"/"assistant", "content":...}]
 if "last_context" not in st.session_state:
     st.session_state.last_context = ""
 
-
 # Top layout: Ingest + Health
-
 top_left, top_right = st.columns([1.1, 0.9], vertical_alignment="top")
 
 with top_left:
@@ -119,11 +141,11 @@ with top_left:
 
     c1, c2, c3 = st.columns([0.35, 0.35, 0.3])
     with c1:
-        ingest_click = st.button(" Ingest / Re-ingest", use_container_width=True)
+        ingest_click = st.button("Ingest / Re-ingest", use_container_width=True)
     with c2:
-        clear_cache = st.button(" Clear caches", use_container_width=True)
+        clear_cache = st.button("Clear caches", use_container_width=True)
     with c3:
-        clear_chat = st.button(" Clear chat", use_container_width=True)
+        clear_chat = st.button("Clear chat", use_container_width=True)
 
     if clear_cache:
         st.cache_data.clear()
@@ -141,12 +163,11 @@ with top_left:
                 docs_path=docs_path,
                 persist_dir=persist_dir,
                 collection_name=collection_name,
-                openai_api_key=api_key,
+                openai_api_key=api_key,   # ensure we use the resolved key
                 chunk_size=chunk_size,
                 overlap=overlap,
             )
         st.success(f"Done. Chunks added: {result.get('chunks_added', 0)}")
-        # Clear cached index so retrieval uses the latest ingestion
         st.cache_resource.clear()
         st.cache_data.clear()
         st.rerun()
@@ -173,7 +194,6 @@ with top_right:
 
 st.divider()
 
-
 # Main Questions and Answers
 left, right = st.columns([1.1, 0.9], vertical_alignment="top")
 
@@ -188,7 +208,6 @@ with left:
     question = st.chat_input("Ask something from your uploaded docs…")
 
     if question:
-        # Store user message
         st.session_state.messages.append({"role": "user", "content": question})
         with st.chat_message("user"):
             st.write(question)
@@ -200,7 +219,7 @@ with left:
                     k=top_k,
                     persist_dir=persist_dir,
                     collection_name=collection_name,
-                    api_key=api_key,
+                    api_key=api_key,  # resolved key
                 )
 
             if not contexts:
@@ -231,7 +250,6 @@ with left:
         except Exception as e:
             st.error(f"Error: {e}")
 
-
 with right:
     st.markdown("### Retrieved context & sources")
     st.markdown("<div class='block'>", unsafe_allow_html=True)
@@ -250,7 +268,6 @@ with right:
         st.info("Ask a question to see the retrieved context here.")
 
     st.markdown("</div>", unsafe_allow_html=True)
-
 
 st.divider()
 st.caption(
